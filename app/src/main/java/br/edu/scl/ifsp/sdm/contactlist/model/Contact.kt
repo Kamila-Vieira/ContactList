@@ -1,11 +1,12 @@
 package br.edu.scl.ifsp.sdm.contactlist.model
 
 import android.os.Parcelable
+import br.edu.scl.ifsp.sdm.contactlist.model.Constant.INVALID_CONTACT_ID
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Contact(
-    var id: Int? = -1,
+    var id: Int? = INVALID_CONTACT_ID,
     var name: String = "",
     var address: String = "",
     var phone: String = "",
