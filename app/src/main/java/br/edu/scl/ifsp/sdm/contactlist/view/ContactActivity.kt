@@ -23,7 +23,6 @@ class ContactActivity : AppCompatActivity() {
         supportActionBar?.subtitle = getString(R.string.contact_details)
 
 
-
         val receivedContact = intent.getParcelableExtra<Contact>(EXTRA_CONTACT)
         receivedContact?.let { received ->
             val isViewContact = intent.getBooleanExtra(EXTRA_VIEW_CONTACT, false)
