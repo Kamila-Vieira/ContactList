@@ -20,7 +20,7 @@ import br.edu.scl.ifsp.sdm.contactlist.model.Constant.EXTRA_CONTACT
 import br.edu.scl.ifsp.sdm.contactlist.model.Constant.EXTRA_VIEW_CONTACT
 import br.edu.scl.ifsp.sdm.contactlist.model.Contact
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnContactClickListener {
     private val amb: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     // Adapter
     private val contactAdapter: ContactRvAdapter by lazy {
-        ContactRvAdapter(contactList)
+        ContactRvAdapter(contactList, this)
     }
 
     private lateinit var carl: ActivityResultLauncher<Intent>
@@ -64,12 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         /* TODO: Será feita a implementação da seleção dos itens para o Recyclerview
         amb.contactsRv.setOnItemClickListener{ _, _, position, _ ->
-            Intent(this, ContactActivity::class.java).apply{
-                putExtra(EXTRA_CONTACT, contactList[position])
-                putExtra(EXTRA_VIEW_CONTACT, true)
-            }.also {
-                startActivity(it)
-            }
+
         }*/
     }
 
@@ -109,6 +104,15 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             else -> { false }
+        }
+    }
+
+    override fun onContactClick(position: Int) {
+        Intent(this, ContactActivity::class.java).apply{
+            putExtra(EXTRA_CONTACT, contactList[position])
+            putExtra(EXTRA_VIEW_CONTACT, true)
+        }.also {
+            startActivity(it)
         }
     }
 
