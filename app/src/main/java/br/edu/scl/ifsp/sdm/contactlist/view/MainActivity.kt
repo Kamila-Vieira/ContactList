@@ -3,12 +3,8 @@ package br.edu.scl.ifsp.sdm.contactlist.view
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.AdapterView.AdapterContextMenuInfo
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -49,10 +45,11 @@ class MainActivity : AppCompatActivity(), OnContactClickListener {
                     if(contactList.any{ it.id == newOrEditedContact.id }){
                         val position = contactList.indexOfFirst{ it.id == newOrEditedContact.id }
                         contactList[position] = newOrEditedContact
+                        contactAdapter.notifyItemChanged(position)
                     } else{
                         contactList.add(newOrEditedContact)
+                        contactAdapter.notifyItemInserted(contactList.lastIndex)
                     }
-                    contactAdapter.notifyDataSetChanged()
                 }
             }
         }
@@ -60,12 +57,6 @@ class MainActivity : AppCompatActivity(), OnContactClickListener {
         fillContacts()
         amb.contactsRv.adapter = contactAdapter
         amb.contactsRv.layoutManager = LinearLayoutManager(this)
-        // registerForContextMenu(amb.contactsRv) TODO: Será feita a implementação do menu de contexto para o Recyclerview
-
-        /* TODO: Será feita a implementação da seleção dos itens para o Recyclerview
-        amb.contactsRv.setOnItemClickListener{ _, _, position, _ ->
-
-        }*/
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -83,30 +74,6 @@ class MainActivity : AppCompatActivity(), OnContactClickListener {
         }
     }
 
-    override fun onCreateContextMenu(
-        menu: ContextMenu?,
-        v: View?,
-        menuInfo: ContextMenu.ContextMenuInfo?
-    ) {
-        menuInflater.inflate(R.menu.context_menu_main, menu)
-    }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        val position = (item.menuInfo as AdapterContextMenuInfo).position
-
-        return when(item.itemId){
-            R.id.removeContactMi -> {
-                onRemoveContact(position)
-                true
-            }
-            R.id.editContactMi -> {
-                onEditContact(position)
-                true
-            }
-            else -> { false }
-        }
-    }
-
     override fun onContactClick(position: Int) {
         Intent(this, ContactActivity::class.java).apply{
             putExtra(EXTRA_CONTACT, contactList[position])
@@ -116,22 +83,17 @@ class MainActivity : AppCompatActivity(), OnContactClickListener {
         }
     }
 
-    private fun onRemoveContact(position: Int){
-        contactList.removeAt(position)
-        contactAdapter.notifyDataSetChanged()
-        Toast.makeText(this, getString(R.string.contact_removed), Toast.LENGTH_SHORT).show()
-    }
-
-    private fun onEditContact(position: Int){
+    override fun onEditContactMenuItemClick(position: Int) {
         val contact = contactList[position]
         carl.launch(Intent(this, ContactActivity::class.java).apply {
             putExtra(EXTRA_CONTACT, contact)
         })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // unregisterForContextMenu(amb.contactsRv) TODO: Será feita a implementação do menu de contexto para o Recyclerview
+    override fun onRemoveContactMenuItemClick(position: Int) {
+        contactList.removeAt(position)
+        contactAdapter.notifyItemRemoved(position)
+        Toast.makeText(this, getString(R.string.contact_removed), Toast.LENGTH_SHORT).show()
     }
 
     private fun fillContacts(){
